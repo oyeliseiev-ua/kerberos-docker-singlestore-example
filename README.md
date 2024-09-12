@@ -1,14 +1,8 @@
-# README - Kerberos/Docker
+# README - Kerberos/SingleStore/Docker
 
-[![Build status](https://github.com/criteo/kerberos-docker/actions/workflows/ci.yml/badge.svg)](https://github.com/criteo/kerberos-docker/actions/workflows/ci.yml)
+Kerberos/SingleStore/Docker is a project that allows for the quick setup and testing of SingleStoreDB configured with Kerberos server.
 
-Kerberos/Docker is a project to run easily a **MIT Kerberos V5** architecture in a cluster of **docker containers**. It is really useful for running integration tests of projects using Kerberos or for learning and testing Kerberos solutions and administration.
-
-<p align="center">
-  <img src="./doc/kerberos-docker-logo.png" width=200/>
-</p>
-
-See: [MIT Kerberos V5](https://web.mit.edu/kerberos/) and [Docker](https://www.docker.com/).
+The configuration of the Kerberos server has been simplified and is based on an example from [kerberos-docker](https://github.com/criteo/kerberos-docker)
 
 ## Prerequisites
 
@@ -17,38 +11,21 @@ Use an **operating system compatible with docker**, and install:
 - **docker-compose**
 - **GNU Make** (if not already available).  
 - **GNU Bash** (if not already available).
-
-Only if you want to generate other docker configurations, install:
 - **Python 3** (if not already available, with `pip` and `venv`).
-
-Only if you want to use java on your host machine:
 - **Java 8 and Maven 3** (if not already available).  
-
-To check the compatible version, see the traces of the `Check version` on GitHub actions (CI) web interface, see [here](https://github.com/criteo/kerberos-docker/actions).  
-
-To run tests, install **Bats**, see `./.ci/install.sh`.
-
-Note:
-- For Linux and MacOS workstations, it works on all distributions. 
-- For Windows workstation, it works on [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/about) 
-with Ubuntu, but connect to the docker container to interact with the Kerberos server. 
 
 ## Usage
 
-After installation, there are 3 containers with a web server on each one to check if it turns:
+After installation, there are 2 containers to check if it turns:
 
-- `krb5-machine-example-com`
-- `krb5-kdc-server-example-com`
-- `krb5-service-example-com`
+- `krb5-kdc-server-example-com` (Kerberos Server)
+- `krb5-singlestoredb-example-com` (SingleStore DB)
 
-The goal is to connect from `krb5-machine-example-com` to `krb5-service-example-com` with ssh and Kerberos authentication (using GSSAPIAuthentication).
-
-Here cluster architecture:
+The goal is to connect from `localhost` to `krb5-singlestoredb-example-com` with SingleStore JDBC client and Kerberos authentication.
 
 <p align="center">
-  <img src="./doc/kerberos-docker-architecture.png" width=700/>
+  <img src="./doc/kerberos-singlestore-architecture.png" width=700/>
 </p>
-
 
 ## Installation
 
@@ -58,10 +35,14 @@ Execute:
 make install
 ~~~
 
-It will use the `./build-ubuntu-example-com` folder, with docker containers under `Ubuntu` and with the kerberos realm `EXAMPLE.COM`.
-If you want to use another OS for the docker containers and/or other  Kerberos realm, you need to use `make gen-conf` see `Prerequisites` section.
-
 See `Makefile` with `make usage` for all commands.
+
+## Testing
+
+To test Kerberos authentication using the SingleStore JDBC driver, navigate to `/src/main/java/com/singlestore/GssClientJdbc.java` and run the program. 
+If everything is set up correctly, it should successfully log in with the `singlestore` user.
+
+To test Kerberos authentication using the SingleStore client use this [instructions](https://docs.singlestore.com/db/v8.7/security/authentication/kerberos-authentication/configuring-singlestore-for-kerberos-authentication/#connecting-to-singlestore-as-a-kerberos-authenticated-user)
 
 ## Uninstallation
 
@@ -71,36 +52,9 @@ Execute:
 make clean
 ~~~
 
-To delete `network-analyser`, do `./network-analyser/clean-network-analyser.sh`.
-
 For Ubuntu operating system on the docker container:
 
-To delete `ubuntu:22.04` and `minimal-ubuntu:latest` docker images do `docker rmi ubuntu:22.04 minimal-ubuntu`.
-
-## Test
-
-This project is tested with
-[Bash Automated Testing System (BATS)](https://github.com/bats-core/bats-core).
-
-
-After installing `BATS` (see version in Prerequisites part) and the environment of containers to test, do: 
-
-~~~
-make test
-~~~
-
-##  Continuous Integration (CI)
-
-This project uses continuous integration with [GitHub Actions](https://github.com/features/actions).  
-
-See all the worflow runs on the CI, [here](https://github.com/criteo/kerberos-docker/actions/workflows/ci.yml).
-
-
-## Network analyzer
-
-You can create a [wireshark](https://www.wireshark.org/) instance running in a docker container built from docker image named `network-analyser`.
-
-See more details in `./network-analyser/README.md`.
+To delete `minimal-ubuntu:latest` docker images do `docker rmi minimal-ubuntu`.
 
 ## Debug and see traces
 
@@ -110,23 +64,11 @@ You can connect with an interactive session to a docker container:
 docker exec -it <container_name_or_id> bash
 ~~~
 
-To debug Kerberos client or server:
+To debug Kerberos server:
 
 ~~~
 export KRB5_TRACE=/dev/stdout
 ~~~
-
-To debug ssh client:
-
-~~~~
-ssh -vvv username@host
-~~~~
-
-To debug the ssh server:
-
-~~~~
-/usr/sbin/sshd -f /etc/ssh/sshd_config -d -e
-~~~~
 
 ## Troubleshooting
 
@@ -170,30 +112,22 @@ the Kerberos cluster:
 
 # Kerberos cluster
 # IP FQDN hostname
-10.5.0.1	krb5-machine-example-com.example.com krb5-machine-example-com
 10.5.0.2	krb5-kdc-server-example-com.example.com krb5-kdc-server-example-com
-10.5.0.3	krb5-service-example-com.example.com krb5-service-example-com
+10.5.0.3	krb5-singlestoredb-example-com.example.com krb5-singlestoredb-example-com
 
 # ...
 ~~~
 
 You can `ping krb5-kdc-server-example-com|10.5.0.2` Kerberos KDC server, and check if
-Kerberos server port is opened: `nmap -A 10.5.0.2/32 -p 88` (or if SSH
-server port: `nmap -A 10.5.0.3/32 -p 22`).
+Kerberos server port is opened: `nmap -A 10.5.0.2/32 -p 88`.
 
-Now you can debug code and do `kinit bob` on the host machine directly.
+Now you can debug code and do `kinit singlestore` on the host machine directly.
 
 The order of `entries` and `names` is important in `/etc/hosts`.
 To resolve name from an IP address, the resolver takes the first one (horizontally) if multiple names
 are possible; and to resolve IP address from the name , the resolver takes the first entry (vertically)
 if multiple IP addresses are possible: You can use `resolveip <IP|name>`, `getent hosts <IP|name>`
 or just take a look at `/etc/hosts`.
-
-## Possible improvements
-
-* Add LDAP as database for the Kerberos architecture
-* Add other connectors and service (postgresql, mongodb, nfs, hadoop) only OpenSSH for the moment
-* Add Java, Python or C to connect with Kerberos authentication
 
 ## References
 

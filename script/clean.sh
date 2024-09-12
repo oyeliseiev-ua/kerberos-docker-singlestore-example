@@ -62,17 +62,4 @@ else
   docker network rm ${network_id}
 fi
 
-read -p "Do you want to remove generated configuration " \
-"(docker-compose.yml, .env.values and .build files)? [Y/n]: " \
-answer
-if [[ "${answer}" =~ ^(Y|y|yes|)$ ]]; then
-  rm -v docker-compose.yml .env.values .build
-fi
-
-read -p "Do you want to remove build folder (./${build_name})? [Y/n]: " \
-answer
-if [[ "${answer}" =~ ^(Y|y|yes|)$ ]]; then
-  rm -rv "./${build_name}"
-fi
-
 echo "You can remove your minimal-<os> and <os>:<version> docker images at the hand now, if you want..."

@@ -1,1 +1,36 @@
-./build-ubuntu-example.com/docker-compose.yml
+version: '3'
+
+services:
+  kdc-server-example-com:
+    build: 
+      context: ./build-ubuntu-example.com/
+      dockerfile: ./krb5-ubuntu/kdc-server/Dockerfile
+    image: krb5-kdc-server-example-com
+    container_name: krb5-kdc-server-example-com
+    hostname: krb5-kdc-server-example-com
+    domainname: example.com
+    networks:
+      example.com:
+        ipv4_address: 10.5.0.2
+    volumes:
+     - /home/singlestore/kerberos-docker:/root/share
+
+  singlestoredb:
+    image: ghcr.io/singlestore-labs/singlestoredb-dev:latest
+    environment:
+      SINGLESTORE_LICENSE: $SINGLESTORE_LICENSE
+      ROOT_PASSWORD: root
+    ports:
+      - "5506:3306"
+    container_name: krb5-singlestoredb-example-com
+    hostname: krb5-singlestoredb-example-com
+    domainname: example.com
+    networks:
+      example.com:
+        ipv4_address: 10.5.0.3
+    volumes:
+      - /home/singlestore/kerberos-docker:/root/share
+
+networks:
+  example.com:
+    external: true

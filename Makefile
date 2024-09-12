@@ -13,6 +13,7 @@ SHARED_FOLDER = $(shell echo $${SHARED_FOLDER:-${{PWD}}})
 
 TEST = ./test
 SCRIPT = ./script
+DEVSCRIPT = ./dev-local
 
 # check minimal installation
 ifeq ($(shell which docker),)
@@ -30,23 +31,7 @@ endif
 
 .PHONY: usage
 usage:
-	@echo "targets include: usage gen-conf pre-build build install test stop start status restart clean switch"
-
-# Choose your OS_CONTAINER (by defaut ubuntu with make install):
-# make gen-conf OS_CONTAINER=<os>
-# OS_CONTAINER=<os> is valid for all targets depending on this target gen-conf
-.PHONY: gen-conf
-gen-conf:
-	@export PREFIX_KRB5=$(PREFIX_KRB5); \
-	export REALM_KRB5=$(REALM_KRB5); \
-	export OS_CONTAINER=$(OS_CONTAINER); \
-	export NETWORK_CONTAINER=$(NETWORK_CONTAINER); \
-	export DOMAIN_CONTAINER=$(DOMAIN_CONTAINER); \
-	export SHARED_FOLDER=$(SHARED_FOLDER); \
-	$(SCRIPT)/get-env.sh && \
-	source $(SCRIPT)/build-python-env.sh  && \
-	$(SCRIPT)/generate_from_template.py && \
-	$(SCRIPT)/link-build.sh
+	@echo "targets include: usage pre-build build install stop start status restart clean"
 
 .PHONY: pre-build
 pre-build:
@@ -66,13 +51,7 @@ init: start
 	@$(SCRIPT)/init.sh
 
 .PHONY: install
-install: create init
-
-# Run all tests (only if you know what you do else make test is sufficient):
-# sudo make test TEST_ON_HOST_MACHINE=yes
-.PHONY: test
-test:
-	@$(TEST)/run_all_tests.sh
+install: create init local
 
 .PHONY: stop
 stop:
@@ -81,6 +60,10 @@ stop:
 .PHONY: start
 start:
 	@$(SCRIPT)/start.sh
+
+.PHONY: local
+local:
+	@$(DEVSCRIPT)/ubuntu/init_dev_env.sh
 
 .PHONY: status
 status:
@@ -92,7 +75,3 @@ restart: stop start
 .PHONY: clean
 clean: status stop
 	@$(SCRIPT)/clean.sh
-
-.PHONY: switch
-switch:
-	@$(SCRIPT)/switch-build.sh $(PROJECT)
