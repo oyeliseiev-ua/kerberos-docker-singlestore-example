@@ -31,7 +31,7 @@ endif
 
 .PHONY: usage
 usage:
-	@echo "targets include: usage pre-build build install stop start status restart clean"
+	@echo "targets include: usage pre-build build install stop start init_local_env status restart clean"
 
 .PHONY: pre-build
 pre-build:
@@ -51,7 +51,7 @@ init: start
 	@$(SCRIPT)/init.sh
 
 .PHONY: install
-install: create init local
+install: create init init_local_env
 
 .PHONY: stop
 stop:
@@ -61,8 +61,8 @@ stop:
 start:
 	@$(SCRIPT)/start.sh
 
-.PHONY: local
-local:
+.PHONY: init_local_env
+init_local_env:
 	@$(DEVSCRIPT)/ubuntu/init_dev_env.sh
 
 .PHONY: status

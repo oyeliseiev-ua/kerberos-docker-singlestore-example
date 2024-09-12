@@ -39,10 +39,10 @@ See `Makefile` with `make usage` for all commands.
 
 ## Testing
 
-To test Kerberos authentication using the SingleStore JDBC driver, navigate to `/src/main/java/com/singlestore/GssClientJdbc.java` and run the program. 
+* To test Kerberos authentication using the SingleStore JDBC driver, navigate to `/src/main/java/com/singlestore/GssClientJdbc.java` and run the program. 
 If everything is set up correctly, it should successfully log in with the `singlestore` user.
 
-To test Kerberos authentication using the SingleStore client use this [instructions](https://docs.singlestore.com/db/v8.7/security/authentication/kerberos-authentication/configuring-singlestore-for-kerberos-authentication/#connecting-to-singlestore-as-a-kerberos-authenticated-user)
+* To test Kerberos authentication using the SingleStore client use this [instructions](https://docs.singlestore.com/db/v8.7/security/authentication/kerberos-authentication/configuring-singlestore-for-kerberos-authentication/#connecting-to-singlestore-as-a-kerberos-authenticated-user)
 
 ## Uninstallation
 

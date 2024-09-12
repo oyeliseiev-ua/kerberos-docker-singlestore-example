@@ -17,13 +17,6 @@ suffix_realm=$(echo "${REALM_KRB5}" | sed 's/\./-/g' | tr [:upper:] [:lower:])
 build_id=$(echo "${OS_CONTAINER}-${REALM_KRB5}" | tr [:upper:] [:lower:])
 build_name="build-${build_id}"
 
-read -p "Do you want to remove virtual python environment "\
-"(./.venv folder)? [Y/n]: " \
-answer
-if [[ "${answer}" =~ ^(Y|y|yes|)$ ]]; then
-  rm -v -rf ./.venv
-fi
-
 read -p "Do you want to remove services as docker containers? [Y/n]: " \
 answer
 if [[ ! "${answer}" =~ ^(Y|y|yes|)$ ]]; then

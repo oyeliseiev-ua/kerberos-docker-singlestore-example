@@ -45,27 +45,6 @@ echo -e 'gssapi-principal-name = singlestore@EXAMPLE.COM\n' >> /data/master/mems
 echo "=== Restart "${service_container}" docker container ==="
 docker restart "${service_container}"
 
-#echo "=== Init "${machine_container}" docker container ==="
-#docker exec "${machine_container}" /bin/bash -c "
-#
-#die() {
-#  >&2 echo \"$1\"
-#  exit 1
-#}
-#
-#echo '* Kerberos password authentication:'
-#until echo singlestore | kinit singlestore@${REALM_KRB5}; do
-#  echo Waiting for kerberos server started ...
-#  sleep 1
-#done
-#
-#echo '* Kerberos keytab authentication:'
-#kinit -kt /etc/singlestore.keytab singlestore@${REALM_KRB5} && echo OK || die KO
-#
-#echo '* Kerberos tickets cache:'
-#klist
-#"
-
 echo "=== Create singlestore db user==="
 docker exec "${service_container}" /bin/bash -c "
 until echo \"create database if not exists kerberos_db; CREATE USER IF NOT EXISTS 'singlestore'@'%' IDENTIFIED WITH 'authentication_gss' AS '/^singlestore@EXAMPLE\.COM$'; GRANT ALL ON kerberos_db.* to 'singlestore'@'%';\" | singlestore -v -v -v --user=root -h 127.0.0.1 -P 3306 --password=root; do
@@ -73,16 +52,3 @@ until echo \"create database if not exists kerberos_db; CREATE USER IF NOT EXIST
   sleep 3
 done
 "
-
-#echo "=== Init GSS API for Java Client/Server ==="
-#cd gssapi-java/
-#
-#mvn --settings=settings.xml install -Dmaven.test.skip=true
-#
-#docker cp gss-client/target/gss-client-1.0-SNAPSHOT-jar-with-dependencies.jar "${machine_container}":/root/client.jar
-#docker cp gss-client/config/jaas-krb5.conf "${machine_container}":/root/jaas-krb5.conf
-#docker cp gss-client/script/client-gss-java.sh "${machine_container}":/root/client-gss-java.sh
-
-#docker cp gss-server/target/gss-server-1.0-SNAPSHOT-jar-with-dependencies.jar "${service_container}":/root/server.jar
-#docker cp gss-server/config/jaas-krb5.conf "${service_container}":/root/jaas-krb5.conf
-#docker cp gss-server/script/server-gss-java.sh "${service_container}":/root/server-gss-java.sh
