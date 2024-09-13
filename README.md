@@ -14,6 +14,9 @@ Use an **operating system compatible with docker**, and install:
 - **Python 3** (if not already available, with `pip` and `venv`).
 - **Java 8 and Maven 3** (if not already available).  
 
+## SingleStore license
+Create the **SINGLESTORE_LICENSE** environment variable with the license key required to start the SingleStoreDB Docker container.
+
 ## Usage
 
 After installation, there are 2 containers to check if it turns:
