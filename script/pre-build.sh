@@ -26,4 +26,4 @@ fi
 
 # Build template minimal operating system for each container
 echo "=== pre-build docker image 'minimal-${OS_CONTAINER}' ==="
-docker build -t  "${image_name}" "./${build_name}/${PREFIX_KRB5}-${OS_CONTAINER}"
+docker build -t  "${image_name}" "./build-ubuntu-example.com/krb5-ubuntu"

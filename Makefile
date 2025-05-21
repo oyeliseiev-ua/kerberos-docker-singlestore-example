@@ -31,7 +31,7 @@ endif
 
 .PHONY: usage
 usage:
-	@echo "targets include: usage pre-build build install stop start init_local_env status restart clean"
+	@echo "targets include :usage pre-build build install stop start init_local_env status restart clean"
 
 .PHONY: pre-build
 pre-build:
